@@ -165,7 +165,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('build', function(n) {
       grunt.task.run(["shell:prodServer"]);
-      grunt.task.run(["uglify", "processhtml", "watch"]);
+      grunt.task.run(["uglify", "processhtml", "nodemon", "watch"]);
   });
 };
 
