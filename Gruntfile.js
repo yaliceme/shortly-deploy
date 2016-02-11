@@ -80,12 +80,18 @@ module.exports = function(grunt) {
       css: {
         files: 'public/*.css',
         tasks: ['cssmin']
+      },
+      packages: {
+        files: 'package.json',
+        tasks: ['shell:prodServer']
       }
     },
 
     shell: {
       push: {
-        command: ['git push live master']
+        command: function (){
+          return 'git push live master';
+        }
       },
       prodServer: {
         command: ['npm install']
@@ -156,7 +162,7 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('build', function(n) {
-      grunt.task.run(["uglify", "processhtml", "watch"]);
+      grunt.task.run(["uglify", "processhtml", "shell:prodServer", "watch"]);
   });
 };
 
