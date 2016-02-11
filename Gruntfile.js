@@ -48,7 +48,8 @@ module.exports = function(grunt) {
         'lib/**/*.js',
         'public/client/**/*.js',
         'test/**/*.js',
-        './*.js'
+        './server.js',
+        './server-config.js'
         // Add list of files to lint here
       ]
     },
@@ -72,7 +73,6 @@ module.exports = function(grunt) {
           'public/lib/**/*.js',
         ],
         tasks: [
-          'concat',
           'uglify',
           'processhtml'
         ]
@@ -84,11 +84,11 @@ module.exports = function(grunt) {
     },
 
     shell: {
-      devServer: {
+      push: {
         command: ['git push live master']
       },
       prodServer: {
-        command: ['npm install', 'nodemon server.js']
+        command: ['npm install']
       }
     },
   });
@@ -113,7 +113,7 @@ module.exports = function(grunt) {
     nodemon.stdout.pipe(process.stdout);
     nodemon.stderr.pipe(process.stderr);
 
-    grunt.task.run([ 'watch' ]);
+   // grunt.task.run([ 'watch' ]);
   });
 
   grunt.registerTask('prod', function (target) {
@@ -135,21 +135,29 @@ module.exports = function(grunt) {
   grunt.registerTask('test', [ 'eslint', 'mochaTest'
   ]);
 
-  grunt.registerTask('build', [ 'shell:devServer', 'test', 'uglify', 'processhtml', 'shell:prodServer', 'watch'
-  ]);
+  // grunt.registerTask('build', [ 'shell:devServer', 'test', 'uglify', 'processhtml', 'shell:prodServer', 'watch'
+  // ]);
 
-  grunt.registerTask('upload', function(n) {
+  // grunt.registerTask('upload', function(n) {
+  //   if (grunt.option('prod')) {
+  //     grunt.task.run([ 'shell:prodServer','watch' ]);
+  //     // add your production server task here
+  //   } else {
+  //     grunt.task.run([ 'server-dev' ]);
+  //   }
+  // });
+
+  grunt.registerTask('deploy', function(n) {
     if (grunt.option('prod')) {
-      grunt.task.run([ 'shell:prodServer','watch' ]);
-      // add your production server task here
+      grunt.task.run(["test", "shell:push"]);
     } else {
-      grunt.task.run([ 'server-dev' ]);
+      grunt.task.run(["test", "nodemon"]);
     }
   });
 
-  grunt.registerTask('deploy', [
-    // add your deploy tasks here
-  ]);
-
-
+  grunt.registerTask('build', function(n) {
+      grunt.task.run(["uglify", "processhtml", "watch"]);
+  });
 };
+
+
