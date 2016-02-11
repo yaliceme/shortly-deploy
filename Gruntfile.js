@@ -19,17 +19,50 @@ module.exports = function(grunt) {
         script: 'server.js'
       }
     },
+    processhtml: {
+      options: {
+        data: {
+          message: 'Hello world!'
+        }
+      },
+      dist: {
+        files: {
+          'views/layout.ejs': ['views/layout.ejs'],
+          'views/index.ejs': ['views/index.ejs']
+        }
+      }
+    },
 
     uglify: {
+      my_target: {
+        files: {
+          'public/dist/lib.min.js': ['public/lib/backbone.js', 'public/lib/handlebars.js', 'public/lib/jquery.js', 'public/lib/underscore.js'],
+          'public/dist/client.min.js': ['public/client/app.js', 'public/client/createLinkView.js', 'public/client/link.js', 'public/client/links.js', 'public/client/linksView.js', 'public/client/linkView.js', 'public/client/router.js']
+        }
+      }
     },
 
     eslint: {
       target: [
+        'app/**/*.js',
+        'lib/**/*.js',
+        'public/client/**/*.js',
+        'test/**/*.js',
+        './*.js'
         // Add list of files to lint here
       ]
     },
 
     cssmin: {
+      options: {
+        shorthandCompacting: false,
+        roundingPrecision: -1
+      },
+      target: {
+        files: {
+          'public/dist/style.min.css': ['public/style.css']
+        }
+      }
     },
 
     watch: {
@@ -40,7 +73,8 @@ module.exports = function(grunt) {
         ],
         tasks: [
           'concat',
-          'uglify'
+          'uglify',
+          'processhtml'
         ]
       },
       css: {
@@ -50,7 +84,11 @@ module.exports = function(grunt) {
     },
 
     shell: {
+      devServer: {
+        command: ['git push live master']
+      },
       prodServer: {
+        command: ['npm install', 'nodemon server.js']
       }
     },
   });
@@ -59,6 +97,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
+  grunt.loadNpmTasks('grunt-processhtml');
   grunt.loadNpmTasks('grunt-eslint');
   grunt.loadNpmTasks('grunt-mocha-test');
   grunt.loadNpmTasks('grunt-shell');
@@ -77,27 +116,31 @@ module.exports = function(grunt) {
     grunt.task.run([ 'watch' ]);
   });
 
+  grunt.registerTask('prod', function (target) {
 
-  grunt.registerTask('upload', function(n) {
-    if (grunt.option('prod')) {
-      // add your production server task here
-    }
-    grunt.task.run([ 'server-dev' ]);
   });
+
+
+  // grunt.registerTask('upload', function(n) {
+  //   if (grunt.option('prod')) {
+  //     // add your production server task here
+  //   }
+  //   grunt.task.run([ 'server-dev' ]);
+  // });
 
   ////////////////////////////////////////////////////
   // Main grunt tasks
   ////////////////////////////////////////////////////
 
-  grunt.registerTask('test', [
-    'mochaTest'
+  grunt.registerTask('test', [ 'eslint', 'mochaTest'
   ]);
 
-  grunt.registerTask('build', [
+  grunt.registerTask('build', [ 'shell:devServer', 'test', 'uglify', 'processhtml', 'shell:prodServer', 'watch'
   ]);
 
   grunt.registerTask('upload', function(n) {
     if (grunt.option('prod')) {
+      grunt.task.run([ 'shell:prodServer','watch' ]);
       // add your production server task here
     } else {
       grunt.task.run([ 'server-dev' ]);
