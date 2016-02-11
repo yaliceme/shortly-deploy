@@ -94,7 +94,9 @@ module.exports = function(grunt) {
         }
       },
       prodServer: {
-        command: ['npm install grunt-processhtml','npm install']
+        command: function (){
+          return 'npm install';
+        }
       }
     },
   });
