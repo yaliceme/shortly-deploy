@@ -55,10 +55,6 @@ module.exports = function(grunt) {
     },
 
     cssmin: {
-      options: {
-        shorthandCompacting: false,
-        roundingPrecision: -1
-      },
       target: {
         files: {
           'public/dist/style.min.css': ['public/style.css']
